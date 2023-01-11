@@ -11,45 +11,26 @@
 </template>
 
 <script setup>
+	const store = inject('userStore')
+	const { getUser, updateStore } = store
+	const supabase = useSupabaseClient()
+	const router = useRouter()
 
 	const loginActive = ref(true)
 	const message = ref(null)
 
-	const store = inject('userStore')
-	const { getUser } = store
-
-	const supabase = useSupabaseClient()
-	
-
 	const handleLogin = async (id) => {
-		// message.value = 'Login Successful.'
-		// const { data: profile, error } = await supabase
-		// .from('profiles')
-		// .select('*')
-		// .eq('auth_id', id)
-		// .single()
-
-		// if (error) console.log('handle login error: ', error)
-
-		// console.log('profile: ', profile)
-
+		message.value = 'Login Successful.'
 		getUser(id)
-
+		router.back()
 	}
 
-	const handleRegister = async (id, nameInput) => {
+	const handleRegister = async (name, email) => {
+		updateStore({name: name, email: email, emailConfirmed: false})
 
-		const { data, error } = await supabase
-		.from('profiles')
-		.insert([
-		{ name: nameInput, auth_id: id }
-		])
+		loginActive.value = false
 
-		error ? updateMessage(error.message) : updateStore(data.profile)
-
-
-		
-
+		updateMessage('Please check your email and click the confirmation link to continue.')
 	}
 
 	const updateMessage = (msg) => {

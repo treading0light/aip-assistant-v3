@@ -20,9 +20,9 @@
 				<h1>Login</h1>
 				<input type="text" name="email" placeholder="email" v-model="credentials.email" class="input input-bordered border-primary">
 				<input type="password" name="password" placeholder="password" v-model="credentials.password" class="input input-bordered border-primary">
-				<div>
+				<div class="flex flex-col w-full">
 					<button class="btn btn-primary" @click="checkSubmit">Submit</button>
-					<button class="btn btn-primary" @click="action = 'register'">New Account</button>
+					<p @click="action = 'register'" class="link link-info self-end">New Account</p>
 				</div>
 			</div>
 
@@ -33,9 +33,9 @@
 				<input type="password" name="password" placeholder="password" v-model="credentials.password" class="input input-bordered border-primary">
 				<input type="password" name="passwordConfirm" placeholder="confirm password"
 				v-model="passwordConfirm" class="input input-bordered border-primary">
-				<div class="flex w-full justify-center gap-2">
+				<div class="flex flex-col w-full justify-center gap-2">
 					<button class="btn btn-primary" @click="checkSubmit">Submit</button>
-					<button class="btn btn-primary" @click="action = 'login'">Existing User</button>
+					<p @click="action = 'login'" class="link link-info self-end">Existing User</p>
 				</div>
 				
 			</div>
@@ -48,11 +48,9 @@
 </template>
 
 <script setup>
-	import { useUserStore } from '@/stores/UserStore'
-
 	const supabase = useSupabaseClient()
 
-	const store = useUserStore()
+	const store = inject('userStore')
 
 	const confirmedPassword = ref(false)
 	const passwordConfirm = ref('password')
@@ -90,15 +88,6 @@
 		console.log(store.name)
 	}
 
-	// const createProfile = async (id) => {
-	// 	const { data, error } = await supabase
-	// 	    .from('profiles')
-	// 	    .insert([
-	// 	        { name: credentials.name, auth_id: id },
-	// 	  ])
-	// }
-
-
 	const updateMessage = (msg) => {
 		message.value = msg
 		document.addEventListener('click', () => message.value = '')
@@ -106,22 +95,6 @@
 	}
 
 	const checkSubmit = () => {
-
-		const settings = {
-			method: 'POST',
-
-			headers: {
-				credentials: 'same-origin',
-				// 'origin': 'same-origin',
-				'Content-Type': 'application/json',
-				'Accept': 'application/json',
-				// "X-Requested-With": "XMLHttpRequest",
-			},
-
-			body: JSON.stringify(credentials)
-		}
-
-		console.log('action', action.value)
 
 		if (action.value === 'login') {
 			console.log('login')
@@ -131,29 +104,24 @@
 			console.log('register')
 			console.log('password', confirmedPassword.value)
 			if (confirmedPassword.value === true) {
-				submit('register', settings)
+				submit('register')
 			} else {
 				console.log('confirm', false)
-				// updateMessage('Passwords do not match')
-				message.value = 'Passwords do not match'
+				updateMessage('Passwords do not match')
 			}
 		}
 	}
 
-	const submit = async (string, settings) => {
+	const submit = async (string) => {
 
 			if (string == 'register') {
-				let { data, error } = await supabase.auth.signUp(credentials)
-				error ? updateMessage(error) : emit('registerSucess', data.user.id, credentials.name)
+				let { data:user, error } = await supabase.auth.signUp(credentials)
+				error ? updateMessage(error) : emit('registerSucess', credentials.name, credentials.email)
 
-				console.log(data.user.id)
+				console.log('new user id ', user.id)
 			} else {
-				let { data, error } = await supabase.auth.signInWithPassword(credentials)
-				error ? updateMessage(error) : emit('loginSucess', data.user.id)
-				console.log(data.user.id)
+				let { data: user, error } = await supabase.auth.signInWithPassword(credentials)
+				error ? updateMessage(error) : emit('loginSucess', user.id)
 			}
-
-
-		// emit('closeModal')
 	}
 </script>

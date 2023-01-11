@@ -8,31 +8,28 @@
 <script setup>
   import { useUserStore } from '@/stores/UserStore'
 
-  const userStore = useUserStore()
+  const store = useUserStore()
   provide('userStore', useUserStore())
 
   const supabase = useSupabaseClient()
   provide('supabase', supabase)
 
-  const updateUser = (data) => {
-    userStore.$reset()
-    console.log('updating userStore', data)
-    userStore.$patch((state) => {
-      state.name = data.name
-      state.userId = data.id
-      state.loggedIn = true
-    })
+  onMounted(async () => {
+    if (store.user.name) {
+      const { data: user, error } = await supabase.auth.getUser()
+      if (error) {
+        store.partialReset()
+        // navigateTo('/login')
+      }
 
-    console.log(userStore.userId)
-  }
+      if (store.user.emailConfirmed === false) {
+        store.updateStore({ emailConfirmed: true, auth_id: user.id })
 
-  // const fetchUser = async () => {
-  //   // const { data: { user }, error } = await supabase.auth.getUser()
-  //   if (error) console.error(error)
-  //   console.log(user)
-  //   updateUser(user)
-  // }
-
-  onMounted(() => {
+        const { data: profile, error } = await supabase
+        .from('profiles')
+        .insert(store.user)
+      }
+    }
   })
+
 </script>

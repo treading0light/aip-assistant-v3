@@ -10,7 +10,7 @@
 
 <script setup>
 	const store = inject('userStore')
-	const { reset } = store
+	const { partialReset } = store
 
 	const supabase = useSupabaseClient()
 	const props = defineProps({
@@ -21,6 +21,6 @@
 		let { data, error } = await supabase.auth.signOut()
 		if (error) console.log(error)
 
-		reset()
+		partialReset()
 	}
 </script>

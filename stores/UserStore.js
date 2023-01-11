@@ -24,19 +24,30 @@ export const useUserStore = defineStore('UserStore', () => {
 	console.log('from the store', user.value)
 	}
 
-	function reset() {
-		user.value = {
-			id: null,
-			name: null,
-			email: null,
-			profileId: null,
-			authId: null,
-			permission: null,
-			loggedIn: false
+	function updateStore(obj) {
+		const keys = Object.keys(obj)
+
+		for (let key of keys) {
+			user.value[key] = obj[key]
 		}
 	}
 
-	return { user, getUser, reset }
+	function isAdmin() {
+		if (store.role === 'admin') return true
+		else return false
+	}
+
+	function fullReset() {
+		user.value = {}
+	}
+
+	function partialReset() {
+		user.value = {
+			email: user.email
+		}
+	}
+
+	return { user, getUser, updateStore, partialReset, fullReset }
 },
 {
 	persist: {
