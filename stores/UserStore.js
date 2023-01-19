@@ -12,7 +12,7 @@ export const useUserStore = defineStore('UserStore', () => {
 		const { data: profile, error } = await supabase
 		.from('profiles')
 		.select('*')
-		.eq('auth_id', authId)
+		.eq('id', authId)
 		.single()
 
 		if (error) console.log(error)

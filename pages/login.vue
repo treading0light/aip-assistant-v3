@@ -12,7 +12,7 @@
 
 <script setup>
 	const store = inject('userStore')
-	const { getUser, updateStore } = store
+	// const { getUser, updateStore } = store
 	const supabase = useSupabaseClient()
 	const router = useRouter()
 
@@ -20,13 +20,14 @@
 	const message = ref(null)
 
 	const handleLogin = async (id) => {
+		console.log('loginsuce')
 		message.value = 'Login Successful.'
-		getUser(id)
+		store.getUser(id)
 		router.back()
 	}
 
 	const handleRegister = async (name, email) => {
-		updateStore({name: name, email: email, emailConfirmed: false})
+		store.updateStore({name: name, email: email, email_confirmed: false})
 
 		loginActive.value = false
 

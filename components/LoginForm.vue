@@ -98,7 +98,7 @@
 
 		if (action.value === 'login') {
 			console.log('login')
-			submit('login', settings)
+			submit('login')
 
 		} else {
 			console.log('register')
@@ -120,8 +120,8 @@
 
 				console.log('new user id ', user.id)
 			} else {
-				let { data: user, error } = await supabase.auth.signInWithPassword(credentials)
-				error ? updateMessage(error) : emit('loginSucess', user.id)
+				let { data, error } = await supabase.auth.signInWithPassword(credentials)
+				error ? updateMessage(error) : emit('loginSucess', data.user.id)
 			}
 	}
 </script>

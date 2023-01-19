@@ -6,19 +6,14 @@
 const store = inject('userStore')
 
 const checkAuth = (user) => {
-	if (!user.role) {
+	console.log('checking auth')
+	if (!user.name) {
 		navigateTo('/login')
-	} else if (user.role !== 'admin'){
+	} else if (user.admin === false) {
 		navigateTo('/')
 	}
 }
 
 checkAuth(store.user)
 
-// onMounted(() => {
-// 	checkAuth(store.user)
-// })
-
-
-	
 </script>

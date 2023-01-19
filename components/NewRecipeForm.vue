@@ -23,7 +23,7 @@
 	      @change="onChange">
 	    </picture-input> -->
 
-	    <input type="file" multiple ref="pictureInput" @change="onChange" class="file-input file-input-bordered w-full max-w-xs" />
+	    <input type="file" multiple ref="images" @change="onChange" class="file-input file-input-bordered w-full max-w-xs" />
 
 		<div class="w-full flex justify-around mb-10">
 
@@ -58,9 +58,9 @@
 			v-model="directions"></textarea>
 		</div>
 
-		<button @click="postRecipe" class="btn btn-primary">Submit Recipe</button>
+		<button @click="handleSubmit" class="btn btn-primary">Submit Recipe</button>
 
-		<button @click="testRequest" class="btn btn-primary">Test</button>
+		<button @click="testSubmit" class="btn btn-primary">Test</button>
 
 		<ingredient-modal
 		v-if="ingredientModal"
@@ -82,6 +82,7 @@
 <script setup>
 
 	const supabase = inject('supabase')
+	const store = inject('userStore')
 
 	const title = ref('')
 	const description = ref('')
@@ -125,7 +126,6 @@
 		let group = chosenIngredients.value.find(obj => obj.name === subRecipe)
 		group.isActive = true
 		target.value = subRecipe
-		console.log(target.value)
 	}
 
 	const addSubRecipe = () => {
@@ -188,25 +188,79 @@
 		ingredientModal.value = false
 	}
 
+	const fetchIngredients = async () => {
+    // populate pantry with ingredients from DB
+    
+	    let { data, error } = await supabase
+	    .from('ingredients')
+	    .select('*')
+
+	    if (error) console.error(error)
+	    else return data
+
+    }
+
 	const onChange = () => {
 		// runs when picture-input value changes
 
-		console.log(pictureInput.value.files[0])
+		// console.log(pictureInput.value.files)
 
-		if (pictureInput.value.files[0]) images.value = pictureInput.value.files[0]
+		// if (pictureInput.value.files) images.value = pictureInput.value.files
+
+		console.log(images.value.files)
     }
 
 	const handleSubmit = async () => {
-		// const recipeData = getRecipeData()
-		// await postRecipe(recipeData)
+		const recipeData = getRecipeData()
+		const recipeId = await postRecipe(recipeData)
 
-		const ingredientsData = getIngredientsData()
+		const ingredientsData = getIngredientsData(recipeId)
+
 		console.log(ingredientsData)
-		// await postIngredients(ingredientsData)
+		await postIngredients(ingredientsData)
 
-		// if (images.value.length > 0) storeRecipeImages(images.value)
+		if (images.value) {
+			console.log('image array ', images.value.files)
+			for (var i = images.value.files.length - 1; i >= 0; i--) {
 
+				console.log('uploading image ', images.value.files[i])
+				const name = await storeRecipeImage(images.value.files[i])
 
+				const path = await getImageUrl(name)
+
+				await postRecipeImage(path, recipeId)
+			}
+		}
+
+	}
+
+	const testSubmit = async () => {
+		// const recipeData = getRecipeData()
+		// console.log('recipeData ', recipeData)
+
+		// const ingredientsData = getIngredientsData(1221)
+		// console.log('ingredientsData ', ingredientsData)
+
+		const name = await storeRecipeImage(images.value.files[0])
+
+		const path = await getImageUrl(name)
+
+		await postRecipeImage(path, 29)
+
+	}
+
+	const getSlug = (string) => {
+		const slug = string.toLowerCase()
+		.replace(/[^a-zA-Z0-9- ]/g, "")
+		.replace(/\s+/g, '-')
+
+		return slug
+	}
+
+	const randIntString = (max) => {
+		let number = Math.floor(Math.random() * max)
+
+		return number.toString()
 	}
 
     const getRecipeData = () => {
@@ -215,13 +269,14 @@
     		title: title.value,
     		description: description.value,
     		directions: directions.value,
-    		'src-url': srcUrl.value
+    		src_url: srcURL.value,
+    		slug: getSlug(title.value)
     	}
 
     	return data
     }
 
-    const getIngredientsData = () => {
+    const getIngredientsData = (recipeId) => {
     	// map ingredient ids with pivot table attributes
 
     	return chosenIngredients.value.flatMap(obj => obj.ingredients).map(i => {
@@ -240,72 +295,79 @@
     		}
 
     		return {
-    			id: i.id,
+    			ingredient_id: i.id,
+    			recipe_id: recipeId,
     			qty: i.qty,
     			unit: i.unit,
-    			subRecipe: i.subRecipe
+    			sub_recipe: i.subRecipe
     		}
 		})
     }
 
     const postRecipe = async (formData) => {
 
-    let { data, error } = await supabase
-    .from('recipes')
-    .insert([formData])
+	    let { data, error } = await supabase
+	    .from('recipes')
+	    .insert([formData])
+	    .select()
+	    .single()
 
-    if (error) {
-      console.error(error)
-    } else {
-      console.log(data)
-    }
-  }
+	    if (error) {
+	      console.error(error)
+	    } else {
+	    	console.log('Recipe successfully posted.')
+	    }
 
-  const postIngredients = async (formData) => {
+		return data.id
+	  }
 
-      let { data, error } = await supabase
-    .from('ingredient_recipe')
-    .insert([formData])
+	const postIngredients = async (formData) => {
 
-    if (error) {
-      console.error(error)
-    } else {
-      console.log(data)
-    }
-  }
+    	let { data, error } = await supabase
+	    .from('ingredient_recipe')
+	    .insert(formData)
 
-  const fetchIngredients = async () => {
-    // populate pantry with ingredients from DB
-    
-    let { data, error } = await supabase
-    .from('ingredients')
-    .select('*')
+	    if (error) {
+	      console.error(error)
+	    } else {
+	      console.log('Ingredients successfully posted')
+	    }
+	}
 
-    if (error) console.error(error)
-    else return data
+	const getImageUrl = async (fileName) => {
+		let { data, error } = await supabase.storage
+	  	.from('recipe-images')
+	  	.getPublicUrl(fileName)
 
-  }
+	  	if (error) console.error(error)
 
-  const postRecipeImages = async (path, recipeId) => {
-    const { data, error } = await supabase
-    .from('recipe_images')
-    .insert([{
-      path: path,
-      recipe_id: recipeId,
-      user_id: store.user.authId
-    }])
-  }
+	  	return data.publicUrl
+	}
 
-  const storeRecipeImages = async (files) => {
+	const postRecipeImage = async (path, recipeId) => {
+
+	    let { data, error } = await supabase
+	    .from('recipe_images')
+	    .insert([{
+	      path: path,
+	      recipe_id: recipeId,
+	      user_id: store.user.id
+	    }])
+
+	    if (error) console.error(error)
+	}
+
+    const storeRecipeImage = async (file) => {
     // files should be an array of image files
-    const { data:path, error } = await supabase.storage
-    .from('recipe_image_storage')
-    .upload(files)
+	    let { data, error } = await supabase.storage
+	    .from('recipe-images')
+	    // .upsertFile(file.name, file)
+	    .upload(getSlug(title.value) + randIntString(10000), file,)
 
-    if (error) console.error(error)
+	    if (error) console.error(error)
 
-    postRecipeImages(path)
-  }
+	    return file.name
+	}
 
     onMounted(async () => {
     	pantryIngredients.value = await fetchIngredients()

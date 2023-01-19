@@ -11,7 +11,7 @@
 
       <DropdownNav />
 
-      <DropdownUser v-if="user.name != '' && user.name != null" :name="user.name" />
+      <DropdownUser v-if="user.name != null" :name="user.name" />
 
       <NuxtLink v-else to="/login" > <button class="btn btn-ghost rounded-btn" >LOGIN</button> </NuxtLink>
 
