@@ -12,7 +12,7 @@
 		</div>
 
 		<div>
-			<p v-for="line in recipe.directions">{{ line }}</p>
+			<p>{{ recipe.directions }}</p>
 		</div>
 		
 		
@@ -24,42 +24,42 @@
 	import { useRoute } from 'vue-router'
 	import { ref, onMounted, onBeforeMount } from 'vue'
 
-	const recipe = ref({})
-	const ingredients = ref({})
+	const props = defineProps({
+		recipe: Object,
+		ingredients: Array
+	})
 
-	const getRecipe = async (id) => {
-		const res = await fetch('/api/recipe/' + id)
-		.catch(err => console.error(err))
+	console.log(props.recipe, props.ingredients)
 
-		const data = await res.json()
-		return data
-	}
+	// const getRecipe = async (id) => {
+	// 	const res = await fetch('/api/recipe/' + id)
+	// 	.catch(err => console.error(err))
 
-	const devideIngredients = (array) => {
+	// 	const data = await res.json()
+	// 	return data
+	// }
 
-	}
+	// const splitDirections = () => {
+	// 	const string = recipe.value.directions
 
-	const splitDirections = () => {
-		const string = recipe.value.directions
-
-		const splitDir = string.split(/\r?\n/).filter(el => el)
-		recipe.value.directions = splitDir
-		console.log(recipe.value.directions)
-	}
+	// 	const splitDir = string.split(/\r?\n/).filter(el => el)
+	// 	recipe.value.directions = splitDir
+	// 	console.log(recipe.value.directions)
+	// }
 
 	
 
-	onBeforeMount(async () => {
-		const route = useRoute()
-		const id = route.params.id
+	// onBeforeMount(async () => {
+	// 	const route = useRoute()
+	// 	const id = route.params.id
 
-		recipe.value = await getRecipe(id)
-		// console.log(recipe.value.directions)
-		splitDirections()
-	})
+	// 	recipe.value = await getRecipe(id)
+	// 	// console.log(recipe.value.directions)
+	// 	splitDirections()
+	// })
 
-	onMounted(() => {
-		// console.log(recipe.value)
+	// onMounted(() => {
+	// 	// console.log(recipe.value)
 		
-	})
+	// })
 </script>
