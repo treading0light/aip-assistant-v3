@@ -8,21 +8,6 @@
 
 		<input type="text" v-model="srcURL" placeholder="Source URL" class="input input-bordered input-primary w-full max-w-xs text-2xl">
 
-<!-- 		<picture-input
-		  ref="pictureInput"
-	      width="300" 
-	      height="300" 
-	      margin="16" 
-	      accept="image/jpeg,image/png" 
-	      size="10" 
-	      button-class="btn"
-	      :custom-strings="{
-	        upload: '<h1>Bummer!</h1>',
-	        drag: 'Click or drag photo here'
-	      }"
-	      @change="onChange">
-	    </picture-input> -->
-
 	    <input type="file" multiple ref="images" @change="onChange" class="file-input file-input-bordered w-full max-w-xs" />
 
 		<div class="w-full flex justify-around mb-10">
@@ -250,6 +235,9 @@
 	}
 
 	const getSlug = (string) => {
+		// a regex sequence I found online
+		// that produces a decent slug from a title.
+
 		const slug = string.toLowerCase()
 		.replace(/[^a-zA-Z0-9- ]/g, "")
 		.replace(/\s+/g, '-')
@@ -359,14 +347,16 @@
 
     const storeRecipeImage = async (file) => {
     // files should be an array of image files
+
+    	const fileName = getSlug(title.value) + randIntString(10000)
 	    let { data, error } = await supabase.storage
 	    .from('recipe-images')
 	    // .upsertFile(file.name, file)
-	    .upload(getSlug(title.value) + randIntString(10000), file,)
+	    .upload(fileName, file,)
 
 	    if (error) console.error(error)
 
-	    return file.name
+	    return fileName
 	}
 
     onMounted(async () => {

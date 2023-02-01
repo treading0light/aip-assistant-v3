@@ -4,6 +4,8 @@ import { ref } from 'vue'
 export const useUserStore = defineStore('UserStore', () => {
 	const id = 'user-store'
 
+	const lastActivity = ref(null)
+
 	const user = ref({})
 
 	async function getUser(authId) {
@@ -21,7 +23,7 @@ export const useUserStore = defineStore('UserStore', () => {
 
 		user.value = profile
 
-	console.log('from the store', user.value)
+	// console.log('from the store', user.value)
 	}
 
 	function updateStore(obj) {

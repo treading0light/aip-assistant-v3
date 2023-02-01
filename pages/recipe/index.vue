@@ -13,10 +13,18 @@
 
 <script setup>
 
+    const supabase = inject('supabase')
+
     const recipes = ref([])
 
     const fetchRecipes = async () => {
-        return
+        const {data, error } = await supabase
+        .from('recipes')
+        .select('title, description, slug, recipe_images(path)')
+
+        if (error) console.error(error)
+
+        return data
     }
 
     onMounted(async () => {

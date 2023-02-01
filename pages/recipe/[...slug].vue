@@ -21,13 +21,12 @@
 	const getRecipe = async (slug) => {
 		const { data, error } = await supabase
 		.from('recipes')
-		.select(`*`)
+		.select(`*, recipe_images(path)`)
 		.eq('slug', slug)
 		.single()
 		
 
 		if (error) console.error(error)
-			console.log(data.id)
 
 		return data
 
@@ -36,37 +35,38 @@
 	const getIngredients = async (id) => {
 		const { data, error } = await supabase
 		.from('ingredient_recipe')
-		.select(`qty, unit, sub_recipe, ingredients(name).single()`)
+		.select(`qty, unit, sub_recipe, ingredients(name, id)`)
 		.eq('recipe_id', id)
 		
 
 		if (error) console.error(error)
 
-		const ingredients = data.map(i => {
-			return {
-				qty: i.qty,
-				unit: i.unit,
-				sub_recipe: i.sub_recipe,
-				name: i.ingredients[0].name,
+		const ingredients = Object.values(data)
 
-			}
-		})
+		for (let i of ingredients) {
+			i.name = i.ingredients.name
+			i.ingredient_id = i.ingredients.id
 
-		for (ingredient in data.ingredients) {
-			moveName(ingredient)
+			delete i.ingredients
 		}
 
-		console.log(data)
-		return data
+		// ensure 'main' comes first
+		// let sortedIngredients = ingredients.reduce((acc, element) => {
+		// 	if (element.sub_recipe === 'main') {
+		// 		return [element, ...acc]
+		// 	}
 
-	}
+		// 	return [...acc, element]
+		// })
 
-	const moveName = (obj) => {
-		obj.name = obj.ingredients[0].name
+		return ingredients
+
 	}
 
 	recipe.value = await getRecipe(recipeSlug)
+	console.log('recipe.value: ', recipe.value)
 	ingredients.value = await getIngredients(recipe.value.id)
+	console.log('ingredients', ingredients.value)
 
 
 </script>
