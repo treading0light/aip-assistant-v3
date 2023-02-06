@@ -1,6 +1,6 @@
 <template>
 
-	<div class="flex flex-col items-center gap-10">
+	<div id="recipeForm" class="flex flex-col items-center gap-10">
 
 		<input type="text" v-model="title" placeholder="title" class="input input-bordered input-primary w-full max-w-xs text-2xl">
 
@@ -9,6 +9,8 @@
 		<input type="text" v-model="srcURL" placeholder="Source URL" class="input input-bordered input-primary w-full max-w-xs text-2xl">
 
 	    <input type="file" multiple ref="images" @change="onChange" class="file-input file-input-bordered w-full max-w-xs" />
+
+	    <input type="number" ref="servings" placeholder="Servings" class="input input-bordered input-primary w-full max-w-xs text-2xl">
 
 		<div class="w-full flex justify-around mb-10">
 
@@ -48,12 +50,12 @@
 		<button @click="testSubmit" class="btn btn-primary">Test</button>
 
 		<ingredient-modal
-		v-if="ingredientModal"
+		v-if="ingredientModalFlag"
 		@ingredient-created="ingredientCreated"
 		@cancel-ingredient="cancelIngredient"
 		:searchText="searchText">	
 		</ingredient-modal>
-
+		
 		<div v-if="message" class="alert alert-success shadow-lg">
 		  <div>
 		    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -74,9 +76,10 @@
 	const images = ref([])
 	const directions = ref('')
 	const srcURL = ref('')
+	const servings = ref(0)
 
 	const searchText = ref(null)
-	const ingredientModal = ref(false)
+	const ingredientModalFlag = ref(false)
 	let message = null
 	const target = ref('main')
 	const pictureInput = ref(null)
@@ -159,18 +162,19 @@
 		// render modal for new ingredients
 
 		searchText.value = search
-		ingredientModal.value = true
+		ingredientModalFlag.value = true
+		console.log('ingredientModal ' + ingredientModalFlag.value)
 	}
 
 	const ingredientCreated = (ingredient) => {
 		// add created ingredient to pantry and remove modal
 
 		pantryIngredients.value.unshift(ingredient)
-		ingredientModal.value = false
+		ingredientModalFlag.value = false
 	}
 
 	const cancelIngredient = () => {
-		ingredientModal.value = false
+		ingredientModalFlag.value = false
 	}
 
 	const fetchIngredients = async () => {
@@ -257,6 +261,7 @@
     		title: title.value,
     		description: description.value,
     		directions: directions.value,
+    		servings: servings.value,
     		src_url: srcURL.value,
     		slug: getSlug(title.value)
     	}

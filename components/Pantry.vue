@@ -1,16 +1,15 @@
 <template>
-	<div class="relative rounded overflow-x-auto max-h-80">
+	<div id="pantry" class="relative rounded overflow-x-auto max-h-80">
 		<h2 class="font-bold pb-3">Pantry:</h2>
 
 		<input type="text" v-model="ingredientSearch" placeholder="Search">
 		<ul>
 			
-			<li v-for="ingredient in shownIngredients" :key="ingredient.id" class="relative flex">
+			<li v-for="ingredient in shownIngredients" :key="ingredient.id" 
+			class="relative flex">
 
-				<p class="hover:cursor-pointer" @click="choose(ingredient.id)">{{ ingredient.name }}
-				</p>
- 
-				<info-modal v-if="ingredient.description" :title="ingredient.name" :info="ingredient.description" ></info-modal>
+				<IngredientInfo class="hover:cursor-pointer" @click="choose(ingredient.id)"
+				 :ingredient="ingredient" />				
 				
 			</li>
 
@@ -47,7 +46,7 @@
 					return this.ingredients
 				} else {
 					return this.ingredients.filter(obj => 
-						obj.name.includes(this.ingredientSearch)
+						obj.name.toLowerCase().includes(this.ingredientSearch.toLowerCase())
 					)
 				}
 			},
@@ -76,6 +75,8 @@
 			},
 
 			triggerIngredientModal: function () {
+
+				console.log('triggered modal')
 				const search = this.ingredientSearch
 
 				this.ingredientSearch = ''

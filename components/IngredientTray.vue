@@ -7,12 +7,11 @@
 		<ul class="self-end">
 
 			<li v-for="ingredient in ingredients" :key="ingredient.id" class="flex gap-5 items-center">
-				<p class="hover:cursor-pointer" @click="remove(ingredient.id)">{{ ingredient.name }}
-				</p>
 
-				<info-modal v-if="ingredient.description" :title="ingredient.name" :info="ingredient.description" ></info-modal>
+				<IngredientInfo class="hover:cursor-pointer" @click="remove(ingredient.id)"
+				 :ingredient="ingredient" />
 
-				<input type="number" placeholder="Qty" v-model="ingredient.qty" class="input input-bordered w-1/6 text-2xl">
+				<input type="text" placeholder="Qty" v-model="ingredient.qty" class="input input-bordered w-1/6 text-2xl">
 
 				<input type="text" placeholder="Unit" v-model="ingredient.unit" class="input input-bordered w-1/6 text-2xl">
 			</li>
@@ -25,6 +24,9 @@
 <script setup>
 	import InfoModal from './InfoModal.vue'
 	import { ref, watch, onMounted } from 'vue'
+	import { create, all } from 'mathjs'
+
+	const math = create(all, {number: 'Fraction'})
 
 	const props = defineProps({
 		ingredients: Array,
@@ -51,8 +53,14 @@
 
 	const remove = (id) => emit('ingredient-to-pantry', id)
 
+	const toMixed = inject('toMixed')
+
 	onMounted(() => {
 		markActive(props.isActive)
+		const fract = math.fraction('2')
+		console.log('formated fract ', math.format(fract))
+
+		console.log('to mixed ', toMixed(math.format(fract)))
 	})
 	
 </script>

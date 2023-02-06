@@ -18,6 +18,24 @@
   const loading = ref(false)
   provide('loading', loading)
 
+  const toMixed = (fract) => {
+    let numDen = fract.split('/')
+    if (numDen[0] >= numDen[1]) {
+      let whole = Math.floor(numDen[0] / numDen[1])
+      let remainder = numDen[0] % numDen[1]
+
+      if (remainder == 0) {
+        return whole
+      } else {
+          return `${whole} ${remainder}/${numDen[1]}`
+      }
+
+    } else {
+      return fract
+    }
+  }
+  provide('toMixed', toMixed)
+
   const getAuth = async () => {
     const { data, error } = await supabase.auth.getUser()
       if (error) {
