@@ -20,10 +20,10 @@
 
 		<hr>
 
-		<select>
-			<option>{{ recipe.servings }}</option>
-			<option>{{ recipe.servings * 2 }}</option>
-			<option>{{ recipe.servings * 4 }}</option>
+		<select v-model="servingMultiplier">
+			<option selected value="1">{{ recipe.servings }}</option>
+			<option value="2">{{ recipe.servings * 2 }}</option>
+			<option value="4">{{ recipe.servings * 4 }}</option>
 		</select>
 
 		<div class="w-full flex flex-col gap-2 p-4
@@ -31,7 +31,7 @@
 			<h2 class="font-bold text-xl">Ingredients:</h2>
 			<ul v-for="(ingredients, subRec) in subRecipes" class="">
 				<h3 class="font-bold">{{ subRec }}:</h3>
-				<li v-for="ingredient in ingredients">{{ ingredient.name }}  {{ ingredient.qty }} {{ ingredient.unit }}</li>
+				<li v-for="ingredient in compIngredients">{{ ingredient.name }}  {{ toMixed(ingredient.qty) }} {{ ingredient.unit }}</li>
 			</ul>
 		</div>
 
@@ -59,6 +59,20 @@
 		ingredients: Array
 	})
 
+	const subRecipes = ref({})
+	const servingMultiplier = ref(1)
+
+	const compIngredients = computed(() => {
+		let newIng = props.ingredients
+
+		for (let i of newIng) {
+			i.qty = math.multiply(math.fraction(i.qty), servingMultiplier.value)
+			i.qty = toMixed(i.qty)
+		}
+
+		return newIng
+	})
+
 	const imagePrev = (eId) => {
 		let num = Number(eId.split('image')[1])
 
@@ -78,8 +92,6 @@
 			return `#image${num + 1}`
 		}
 	}
-
-	const subRecipes = ref({})
 
 	// console.log('props ', props.recipe, props.ingredients)
 
@@ -116,14 +128,6 @@
 
 	divideIngredients()
 	makeImageIds(props.recipe.recipe_images)
-
-	// const getRecipe = async (id) => {
-	// 	const res = await fetch('/api/recipe/' + id)
-	// 	.catch(err => console.error(err))
-
-	// 	const data = await res.json()
-	// 	return data
-	// }
 
 	// const splitDirections = () => {
 	// 	const string = recipe.value.directions

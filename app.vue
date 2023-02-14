@@ -8,6 +8,9 @@
 
 <script setup>
   import { useUserStore } from '@/stores/UserStore'
+  import { create, all } from 'mathjs'
+
+  const math = create(all, {number: 'Fraction'})
 
   const store = useUserStore()
   provide('userStore', useUserStore())
@@ -19,10 +22,16 @@
   provide('loading', loading)
 
   const toMixed = (fract) => {
+    fract = math.format(math.fraction(fract))
+
     let numDen = fract.split('/')
+    // console.log(numDen)
+
     if (numDen[0] >= numDen[1]) {
+      // console.log('first is bigger', numDen)
       let whole = Math.floor(numDen[0] / numDen[1])
       let remainder = numDen[0] % numDen[1]
+      console.log(whole, remainder)
 
       if (remainder == 0) {
         return whole

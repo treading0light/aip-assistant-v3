@@ -10,7 +10,7 @@
 
 	    <input type="file" multiple ref="images" @change="onChange" class="file-input file-input-bordered w-full max-w-xs" />
 
-	    <input type="number" ref="servings" placeholder="Servings" class="input input-bordered input-primary w-full max-w-xs text-2xl">
+	    <input type="number" v-model="servings" placeholder="Servings" class="input input-bordered input-primary w-full max-w-xs text-2xl">
 
 		<div class="w-full flex justify-around mb-10">
 
@@ -76,7 +76,7 @@
 	const images = ref([])
 	const directions = ref('')
 	const srcURL = ref('')
-	const servings = ref(0)
+	const servings = ref(null)
 
 	const searchText = ref(null)
 	const ingredientModalFlag = ref(false)
@@ -224,17 +224,17 @@
 	}
 
 	const testSubmit = async () => {
-		// const recipeData = getRecipeData()
-		// console.log('recipeData ', recipeData)
+		const recipeData = getRecipeData()
+		console.log('recipeData ', recipeData)
 
 		// const ingredientsData = getIngredientsData(1221)
 		// console.log('ingredientsData ', ingredientsData)
 
-		const name = await storeRecipeImage(images.value.files[0])
+		// const name = await storeRecipeImage(images.value.files[0])
 
-		const path = await getImageUrl(name)
+		// const path = await getImageUrl(name)
 
-		await postRecipeImage(path, 29)
+		// await postRecipeImage(path, 29)
 
 	}
 
@@ -256,6 +256,7 @@
 	}
 
     const getRecipeData = () => {
+    	console.log(servings.value)
 
     	const data = {
     		title: title.value,
