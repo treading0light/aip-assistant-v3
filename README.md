@@ -1,42 +1,10 @@
-# Nuxt 3 Minimal Starter
+# AIP Assistant
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+This app is designed to help someone who has chosen to practice an Auto Immune Protocol diet. An AIP diet starts with an elimination of most ingredients, leaving you with a very small selection. As time progresses you will go through stages of introducing different ingredients, waiting to see if there is a reaction, remove or add permanently the ingredient to your acceptable list, and repeat. This app lets you add ingredients to your profile, and then browse recipes that only include your acceptable ingredients. 
 
-## Setup
-
-Make sure to install the dependencies:
-
-```bash
-# yarn
-yarn install
-
-# npm
-npm install
-
-# pnpm
-pnpm install --shamefully-hoist
-```
-
-## Development Server
-
-Start the development server on http://localhost:3000
-
-```bash
-npm run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-npm run build
-```
-
-Locally preview production build:
-
-```bash
-npm run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Built with:
+- Nuxt.js
+- TailwindCSS
+- SupaBase
+- Pinia
+ 
